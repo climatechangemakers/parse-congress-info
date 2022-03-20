@@ -6,6 +6,7 @@ import com.github.ajalt.clikt.parameters.options.convert
 import com.github.ajalt.clikt.parameters.options.option
 import com.github.ajalt.clikt.parameters.options.required
 import com.github.ajalt.clikt.parameters.types.choice
+import okio.Path
 
 fun main(args: Array<String>) = Parse().main(args)
 
@@ -16,15 +17,15 @@ class Parse : CliktCommand() {
     InputJsonType.CurrentMembersOfCongress.cliValue,
   ).convert { value -> InputJsonType.values().first { value == it.cliValue } }.required()
 
-  private val inputFilePath: String by argument(
+  private val inputFilePath: Path by argument(
     name = "input",
     help = "input JSON file",
-  )
+  ).path(mustExist = true)
 
-  private val outputFilePath: String by argument(
+  private val outputFilePath: Path by argument(
     name = "output",
     help = "output CSV file",
-  )
+  ).path(mustExist = false)
 
   override fun run() = println(
     """
