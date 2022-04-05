@@ -23,6 +23,7 @@ kotlin {
     binaries {
       executable {
         entryPoint = "org.climatechangemakers.parsecongress.main"
+        this.binaryOptions
       }
     }
   }

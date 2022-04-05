@@ -2,36 +2,47 @@ package org.climatechangemakers.parsecongress
 
 import com.github.ajalt.clikt.core.CliktCommand
 import com.github.ajalt.clikt.parameters.arguments.argument
-import com.github.ajalt.clikt.parameters.options.convert
+import com.github.ajalt.clikt.parameters.groups.OptionGroup
+import com.github.ajalt.clikt.parameters.groups.groupChoice
+import com.github.ajalt.clikt.parameters.groups.required
 import com.github.ajalt.clikt.parameters.options.option
 import com.github.ajalt.clikt.parameters.options.required
-import com.github.ajalt.clikt.parameters.types.choice
 import okio.Path
+import org.climatechangemakers.parsecongress.extensions.path
 
 fun main(args: Array<String>) = Parse().main(args)
 
+sealed class FileOption(description: String) : OptionGroup(description) {
+
+  class DistrictOffices : FileOption("Convert a single district offices json into CSV") {
+    val districtOfficesPath: Path by option("-d", "--district-offices").path(mustExist = true).required()
+  }
+
+  class CurrentLegislators : FileOption("Merge CWC and legislators JSON into a single CSV") {
+    val legislatorsPath: Path by option("-l", "--legislators").path(mustExist = true).required()
+    val cwcOfficeCodesPath: Path by option("-c", "--cwc").path(mustExist = true).required()
+  }
+}
+
 class Parse : CliktCommand() {
 
-  private val inputType: InputJsonType by option("-i", "--input-type").choice(
-    InputJsonType.DistrictOffices.cliValue,
-    InputJsonType.CurrentMembersOfCongress.cliValue,
-  ).convert { value -> InputJsonType.values().first { value == it.cliValue } }.required()
-
-  private val inputFilePath: Path by argument(
-    name = "input",
-    help = "input JSON file",
-  ).path(mustExist = true)
+  private val fileGroup by option("-t", "--type").groupChoice(
+    "current-legislators" to FileOption.CurrentLegislators(),
+    "district-offices" to FileOption.DistrictOffices(),
+  ).required()
 
   private val outputFilePath: Path by argument(
     name = "output",
     help = "output CSV file",
   ).path(mustExist = false)
 
-  override fun run() = println(
-    """
-      inputFilePath: $inputFilePath
-      outputFilePath: $outputFilePath
-      inputType: $inputType
-    """.trimIndent()
-  )
+  override fun run() = when (val group = fileGroup) {
+    is FileOption.CurrentLegislators -> {
+      println(group.cwcOfficeCodesPath)
+      println(group.legislatorsPath)
+    }
+    is FileOption.DistrictOffices -> {
+      println(group.districtOfficesPath)
+    }
+  }
 }
