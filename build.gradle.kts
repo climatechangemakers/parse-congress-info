@@ -1,5 +1,6 @@
 plugins {
   alias(libs.plugins.kotlin.multiplatform)
+  alias(libs.plugins.kotlin.serialization)
 }
 
 group = "org.climatechangemakers"
@@ -33,6 +34,8 @@ kotlin {
       dependencies {
         implementation(libs.clikt)
         implementation(libs.okio)
+        implementation(libs.kotlinx.serialization.json)
+        implementation(libs.kotlinx.datetime)
       }
     }
     val nativeTest by getting

@@ -7,8 +7,17 @@ import com.github.ajalt.clikt.parameters.groups.groupChoice
 import com.github.ajalt.clikt.parameters.groups.required
 import com.github.ajalt.clikt.parameters.options.option
 import com.github.ajalt.clikt.parameters.options.required
+import kotlinx.datetime.Clock
+import kotlinx.datetime.LocalDate
+import kotlinx.datetime.TimeZone
+import kotlinx.datetime.toLocalDateTime
+import kotlinx.serialization.encodeToString
+import kotlinx.serialization.json.Json
+import okio.BufferedSource
+import okio.FileSystem
 import okio.Path
 import org.climatechangemakers.parsecongress.extensions.path
+import platform.posix.clock
 
 fun main(args: Array<String>) = Parse().main(args)
 
@@ -38,11 +47,22 @@ class Parse : CliktCommand() {
 
   override fun run() = when (val group = fileGroup) {
     is FileOption.CurrentLegislators -> {
-      println(group.cwcOfficeCodesPath)
-      println(group.legislatorsPath)
+      val stuff = readMemberOfCongressFile(
+        group.legislatorsPath.readContents(),
+        json,
+      )
+
+      println(json.encodeToString(stuff))
     }
     is FileOption.DistrictOffices -> {
-      println(group.districtOfficesPath)
+      println(group.districtOfficesPath.readContents())
     }
   }
+}
+
+private fun Path.readContents(): String = FileSystem.SYSTEM.read(this, BufferedSource::readUtf8)
+
+private val json: Json = Json {
+  ignoreUnknownKeys = true
+  explicitNulls = false
 }
