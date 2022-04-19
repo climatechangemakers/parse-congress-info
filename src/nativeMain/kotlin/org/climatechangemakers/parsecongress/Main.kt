@@ -47,12 +47,12 @@ class Parse : CliktCommand() {
 
   override fun run() = when (val group = fileGroup) {
     is FileOption.CurrentLegislators -> {
-      val stuff = readMemberOfCongressFile(
-        group.legislatorsPath.readContents(),
+      val stuff = parseActiveCwcOffices(
+        group.cwcOfficeCodesPath.readContents(),
         json,
       )
 
-      println(json.encodeToString(stuff))
+      println(stuff.map { it.bioguide })
     }
     is FileOption.DistrictOffices -> {
       println(group.districtOfficesPath.readContents())
