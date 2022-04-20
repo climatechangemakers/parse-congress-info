@@ -37,6 +37,7 @@ sealed class FileOption(description: String) : OptionGroup(description) {
   class CurrentLegislators : FileOption("Merge CWC and legislators JSON into a single CSV") {
     val legislatorsPath: Path by option("-l", "--legislators").path(mustExist = true).required()
     val cwcOfficeCodesPath: Path by option("-c", "--cwc").path(mustExist = true).required()
+    val socialMediaPath: Path by option("-s", "--social").path(mustExist = true).required()
   }
 }
 
@@ -64,7 +65,16 @@ class Parse : CliktCommand() {
         json,
       ).associateBy(ActiveOffice::bioguide, ActiveOffice::officeCode)
 
-      val stuff = combineCurrentLegislators(currentLegislators, activeScwcOffices)
+      val legislatorTwitterAccounts: Map<String, String> = parseUnitedStatedMemberOfCongressSocialMedia(
+        group.socialMediaPath.readContents(),
+        json,
+      ).associateBy(
+        keySelector = { it.id.bioguide },
+        valueTransform = { it.social.twitter },
+      ).filterValues { it != null } as Map<String, String>
+
+
+      val stuff = combineCurrentLegislators(currentLegislators, activeScwcOffices, legislatorTwitterAccounts)
       print(json.encodeToString(stuff))
     }
     is FileOption.DistrictOffices -> {

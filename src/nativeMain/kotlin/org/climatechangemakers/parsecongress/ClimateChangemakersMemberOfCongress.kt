@@ -17,13 +17,19 @@ import kotlinx.serialization.Serializable
 fun combineCurrentLegislators(
   currentLegislators: List<UnitedStatesMemberOfCongress>,
   activeScwcOffices: Map<String, String>,
+  twitterAccounts: Map<String, String>,
 ): List<ClimateChangemakersMemberOfCongress> = currentLegislators.map { legislator ->
-  combineLegislator(legislator = legislator, scwcOfficeCode  = activeScwcOffices[legislator.id.bioguide])
+  combineLegislator(
+    legislator = legislator,
+    scwcOfficeCode = activeScwcOffices[legislator.id.bioguide],
+    twitterAccount = twitterAccounts[legislator.id.bioguide],
+  )
 }
 
 private fun combineLegislator(
   legislator: UnitedStatesMemberOfCongress,
   scwcOfficeCode: String?,
+  twitterAccount: String?,
 ) = ClimateChangemakersMemberOfCongress(
   bioguideId = legislator.id.bioguide,
   fullName = legislator.name.officialFullname,
@@ -32,7 +38,7 @@ private fun combineLegislator(
   congressionalDistrict = legislator.terms.current.district,
   party = legislator.terms.current.party,
   dcPhoneNumber = legislator.phoneNumber,
-  twitterHandle = "TODO",
+  twitterHandle = twitterAccount,
   cwcOfficeCode = generateCWCOfficeCodeForLegislator(legislator, scwcOfficeCode),
 )
 
