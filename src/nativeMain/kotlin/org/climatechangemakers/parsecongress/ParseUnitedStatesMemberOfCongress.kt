@@ -9,7 +9,7 @@ import kotlinx.serialization.Serializable
 import kotlinx.serialization.decodeFromString
 import kotlinx.serialization.json.Json
 
-fun readMemberOfCongressFile(
+fun parseUnitedStatesMemberOfCongressFile(
   rawJson: String,
   json: Json,
 ): List<UnitedStatesMemberOfCongress> {
@@ -22,10 +22,14 @@ fun readMemberOfCongressFile(
   val terms: List<UnitedStatesTermInfo>,
 )
 
-val UnitedStatesMemberOfCongress.phoneNumber: String get() = terms.filter { term ->
+val UnitedStatesMemberOfCongress.phoneNumber: String get() = terms.current.phone!!
+
+val List<UnitedStatesTermInfo>.current: UnitedStatesTermInfo get() {
   val currentDate = Clock.System.todayAt(TimeZone.UTC)
-  term.start <= currentDate && currentDate <= term.end
-}.firstNotNullOf { it.phone }
+  return single { term ->
+    term.start <= currentDate && currentDate <= term.end
+  }
+}
 
 @Serializable class UnitedStatesIdentifiers(
   val bioguide: String,

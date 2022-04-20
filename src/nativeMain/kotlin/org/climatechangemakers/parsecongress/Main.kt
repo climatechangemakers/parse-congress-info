@@ -21,6 +21,13 @@ import platform.posix.clock
 
 fun main(args: Array<String>) = Parse().main(args)
 
+private fun Path.readContents(): String = FileSystem.SYSTEM.read(this, BufferedSource::readUtf8)
+
+private val json: Json = Json {
+  ignoreUnknownKeys = true
+  explicitNulls = false
+}
+
 sealed class FileOption(description: String) : OptionGroup(description) {
 
   class DistrictOffices : FileOption("Convert a single district offices json into CSV") {
@@ -47,22 +54,21 @@ class Parse : CliktCommand() {
 
   override fun run() = when (val group = fileGroup) {
     is FileOption.CurrentLegislators -> {
-      val stuff = parseActiveCwcOffices(
-        group.cwcOfficeCodesPath.readContents(),
+      val currentLegislators: List<UnitedStatesMemberOfCongress> = parseUnitedStatesMemberOfCongressFile(
+        group.legislatorsPath.readContents(),
         json,
       )
 
-      println(stuff.map { it.bioguide })
+      val activeScwcOffices: Map<String, String> = parseActiveCwcOffices(
+        group.cwcOfficeCodesPath.readContents(),
+        json,
+      ).associateBy(ActiveOffice::bioguide, ActiveOffice::officeCode)
+
+      val stuff = combineCurrentLegislators(currentLegislators, activeScwcOffices)
+      print(json.encodeToString(stuff))
     }
     is FileOption.DistrictOffices -> {
       println(group.districtOfficesPath.readContents())
     }
   }
-}
-
-private fun Path.readContents(): String = FileSystem.SYSTEM.read(this, BufferedSource::readUtf8)
-
-private val json: Json = Json {
-  ignoreUnknownKeys = true
-  explicitNulls = false
 }
