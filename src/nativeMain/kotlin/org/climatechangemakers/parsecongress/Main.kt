@@ -7,26 +7,14 @@ import com.github.ajalt.clikt.parameters.groups.groupChoice
 import com.github.ajalt.clikt.parameters.groups.required
 import com.github.ajalt.clikt.parameters.options.option
 import com.github.ajalt.clikt.parameters.options.required
-import kotlinx.datetime.Clock
-import kotlinx.datetime.LocalDate
-import kotlinx.datetime.TimeZone
-import kotlinx.datetime.toLocalDateTime
 import kotlinx.serialization.encodeToString
 import kotlinx.serialization.json.Json
-import okio.BufferedSource
-import okio.FileSystem
 import okio.Path
+import org.climatechangemakers.parsecongress.extensions.filterNotNullValues
 import org.climatechangemakers.parsecongress.extensions.path
-import platform.posix.clock
+import org.climatechangemakers.parsecongress.extensions.readContents
 
 fun main(args: Array<String>) = Parse().main(args)
-
-private fun Path.readContents(): String = FileSystem.SYSTEM.read(this, BufferedSource::readUtf8)
-
-private val json: Json = Json {
-  ignoreUnknownKeys = true
-  explicitNulls = false
-}
 
 sealed class FileOption(description: String) : OptionGroup(description) {
 
@@ -43,6 +31,11 @@ sealed class FileOption(description: String) : OptionGroup(description) {
 
 class Parse : CliktCommand() {
 
+  private val json: Json = Json {
+    ignoreUnknownKeys = true
+    explicitNulls = false
+  }
+
   private val fileGroup by option("-t", "--type").groupChoice(
     "current-legislators" to FileOption.CurrentLegislators(),
     "district-offices" to FileOption.DistrictOffices(),
@@ -54,31 +47,34 @@ class Parse : CliktCommand() {
   ).path(mustExist = false)
 
   override fun run() = when (val group = fileGroup) {
-    is FileOption.CurrentLegislators -> {
-      val currentLegislators: List<UnitedStatesMemberOfCongress> = parseUnitedStatesMemberOfCongressFile(
-        group.legislatorsPath.readContents(),
-        json,
-      )
+    is FileOption.CurrentLegislators -> runCurrentLegislators(group)
+    is FileOption.DistrictOffices -> runDistrictOffices(group)
+  }
 
-      val activeScwcOffices: Map<String, String> = parseActiveCwcOffices(
-        group.cwcOfficeCodesPath.readContents(),
-        json,
-      ).associateBy(ActiveOffice::bioguide, ActiveOffice::officeCode)
+  private fun runCurrentLegislators(group: FileOption.CurrentLegislators) {
+    val currentLegislators: List<UnitedStatesMemberOfCongress> = parseUnitedStatesMemberOfCongressFile(
+      group.legislatorsPath.readContents(),
+      json,
+    )
 
-      val legislatorTwitterAccounts: Map<String, String> = parseUnitedStatedMemberOfCongressSocialMedia(
-        group.socialMediaPath.readContents(),
-        json,
-      ).associateBy(
-        keySelector = { it.id.bioguide },
-        valueTransform = { it.social.twitter },
-      ).filterValues { it != null } as Map<String, String>
+    val activeScwcOffices: Map<String, String> = parseActiveCwcOffices(
+      group.cwcOfficeCodesPath.readContents(),
+      json,
+    ).associateBy(ActiveOffice::bioguide, ActiveOffice::officeCode)
 
+    val legislatorTwitterAccounts: Map<String, String> = parseUnitedStatedMemberOfCongressSocialMedia(
+      group.socialMediaPath.readContents(),
+      json,
+    ).associateBy(
+      keySelector = { it.id.bioguide },
+      valueTransform = { it.social.twitter },
+    ).filterNotNullValues()
 
-      val stuff = combineCurrentLegislators(currentLegislators, activeScwcOffices, legislatorTwitterAccounts)
-      print(json.encodeToString(stuff))
-    }
-    is FileOption.DistrictOffices -> {
-      println(group.districtOfficesPath.readContents())
-    }
+    val stuff = combineCurrentLegislators(currentLegislators, activeScwcOffices, legislatorTwitterAccounts)
+    print(json.encodeToString(stuff))
+  }
+
+  private fun runDistrictOffices(group: FileOption.DistrictOffices) {
+
   }
 }
