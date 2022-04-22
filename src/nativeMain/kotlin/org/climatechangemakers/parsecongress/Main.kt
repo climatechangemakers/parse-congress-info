@@ -13,6 +13,7 @@ import okio.Path
 import org.climatechangemakers.parsecongress.extensions.filterNotNullValues
 import org.climatechangemakers.parsecongress.extensions.path
 import org.climatechangemakers.parsecongress.extensions.readContents
+import org.climatechangemakers.parsecongress.extensions.writeContents
 
 fun main(args: Array<String>) = Parse().main(args)
 
@@ -70,8 +71,9 @@ class Parse : CliktCommand() {
       valueTransform = { it.social.twitter },
     ).filterNotNullValues()
 
-    val stuff = combineCurrentLegislators(currentLegislators, activeScwcOffices, legislatorTwitterAccounts)
-    print(json.encodeToString(stuff))
+    combineCurrentLegislators(currentLegislators, activeScwcOffices, legislatorTwitterAccounts)
+      .let(::dumpToCsv)
+      .run { outputFilePath.writeContents(this) }
   }
 
   private fun runDistrictOffices(group: FileOption.DistrictOffices) {
