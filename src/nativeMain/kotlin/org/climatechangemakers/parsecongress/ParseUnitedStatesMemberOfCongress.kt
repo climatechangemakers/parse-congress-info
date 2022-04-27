@@ -22,9 +22,9 @@ fun parseUnitedStatesMemberOfCongressFile(
   val terms: List<UnitedStatesTermInfo>,
 )
 
-val UnitedStatesMemberOfCongress.phoneNumber: String get() = terms.current.phone!!
+fun UnitedStatesMemberOfCongress.phoneNumber(clock: Clock): String = terms.current(clock).phone!!
 
-val List<UnitedStatesTermInfo>.current: UnitedStatesTermInfo get() {
+fun List<UnitedStatesTermInfo>.current(clock: Clock): UnitedStatesTermInfo {
   val currentDate = Clock.System.todayAt(TimeZone.UTC)
   return single { term ->
     term.start <= currentDate && currentDate <= term.end

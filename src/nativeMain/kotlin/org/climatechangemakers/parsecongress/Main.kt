@@ -7,6 +7,7 @@ import com.github.ajalt.clikt.parameters.groups.groupChoice
 import com.github.ajalt.clikt.parameters.groups.required
 import com.github.ajalt.clikt.parameters.options.option
 import com.github.ajalt.clikt.parameters.options.required
+import kotlinx.datetime.Clock
 import kotlinx.serialization.encodeToString
 import kotlinx.serialization.json.Json
 import okio.Path
@@ -71,7 +72,7 @@ class Parse : CliktCommand() {
       valueTransform = { it.social.twitter },
     ).filterNotNullValues()
 
-    combineCurrentLegislators(currentLegislators, activeScwcOffices, legislatorTwitterAccounts)
+    combineCurrentLegislators(currentLegislators, activeScwcOffices, legislatorTwitterAccounts, Clock.System)
       .let(::dumpToCsv)
       .run { outputFilePath.writeContents(this) }
   }
