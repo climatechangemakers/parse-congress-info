@@ -57,6 +57,6 @@ private fun generateHWCWOfficeCodeForLegislator(
   val term = legislator.terms.current
   return when (term.state) {
     "AS" -> "AQ00" // American Somoa is a special case conflict.
-    else -> "${term.state}${term.district!!.toString().padStart(2, '0')}"
+    else -> "H${term.state}${term.district!!.toString().padStart(2, '0')}"
   }
 }
