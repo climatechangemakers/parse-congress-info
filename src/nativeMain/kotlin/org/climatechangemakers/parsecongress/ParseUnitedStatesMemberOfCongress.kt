@@ -22,10 +22,8 @@ fun parseUnitedStatesMemberOfCongressFile(
   val terms: List<UnitedStatesTermInfo>,
 )
 
-fun UnitedStatesMemberOfCongress.phoneNumber(clock: Clock): String = terms.current(clock).phone!!
-
 fun List<UnitedStatesTermInfo>.current(clock: Clock): UnitedStatesTermInfo {
-  val currentDate = Clock.System.todayAt(TimeZone.UTC)
+  val currentDate = clock.todayAt(TimeZone.UTC)
   return single { term ->
     term.start <= currentDate && currentDate <= term.end
   }
@@ -49,4 +47,12 @@ fun List<UnitedStatesTermInfo>.current(clock: Clock): UnitedStatesTermInfo {
   val phone: String?,
   val start: LocalDate,
   val end: LocalDate
-)
+) {
+  init {
+    if (representativeType == "rep") {
+      requireNotNull(district)
+    } else {
+      require(district == null)
+    }
+  }
+}
