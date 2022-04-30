@@ -10,6 +10,7 @@ import com.github.ajalt.clikt.parameters.options.required
 import kotlinx.datetime.Clock
 import kotlinx.serialization.encodeToString
 import kotlinx.serialization.json.Json
+import okio.BufferedSink
 import okio.Path
 import org.climatechangemakers.parsecongress.extensions.filterNotNullValues
 import org.climatechangemakers.parsecongress.extensions.path
@@ -74,10 +75,12 @@ class Parse : CliktCommand() {
 
     combineCurrentLegislators(currentLegislators, activeScwcOffices, legislatorTwitterAccounts, Clock.System)
       .let(::dumpToCsv)
-      .run { outputFilePath.writeContents(this) }
+      .run(outputFilePath::writeContents)
   }
 
   private fun runDistrictOffices(group: FileOption.DistrictOffices) {
-
+    outputFilePath.writeContents(
+      dumpToCsv(readDistrictOfficeFile(group.districtOfficesPath, json))
+    )
   }
 }
