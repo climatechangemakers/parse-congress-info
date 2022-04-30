@@ -1,0 +1,13 @@
+stages:
+  - test
+  - deploy
+
+run-test:
+  image: openjdk:11.0.12
+  stage: test
+  script: ./gradlew allTests
+  only:
+    - trunk
+    - external_pull_requests
+
+
