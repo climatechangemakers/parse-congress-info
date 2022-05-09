@@ -46,7 +46,7 @@ class Parse : CliktCommand() {
 
   private val outputFilePath: Path by argument(
     name = "output",
-    help = "output CSV file",
+    help = "output SQL file",
   ).path(mustExist = false)
 
   override fun run() = when (val group = fileGroup) {
@@ -74,13 +74,13 @@ class Parse : CliktCommand() {
     ).filterNotNullValues()
 
     combineCurrentLegislators(currentLegislators, activeScwcOffices, legislatorTwitterAccounts, Clock.System)
-      .let(::dumpToCsv)
+      .let(::dumpToSql)
       .run(outputFilePath::writeContents)
   }
 
   private fun runDistrictOffices(group: FileOption.DistrictOffices) {
     outputFilePath.writeContents(
-      dumpToCsv(readDistrictOfficeFile(group.districtOfficesPath, json))
+      dumpToSql(readDistrictOfficeFile(group.districtOfficesPath, json))
     )
   }
 }
