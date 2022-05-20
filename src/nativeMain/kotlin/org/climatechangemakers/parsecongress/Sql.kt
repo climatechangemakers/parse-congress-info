@@ -4,6 +4,8 @@ fun dumpToSql(members: List<ClimateChangemakersMemberOfCongress>) = buildString 
   val values = listOf(
     "bioguide_id",
     "full_name",
+    "first_name",
+    "last_name",
     "legislative_role",
     "state",
     "congressional_district",
@@ -43,6 +45,8 @@ private fun StringBuilder.writerMember(member: ClimateChangemakersMemberOfCongre
   listOf(
     member.bioguideId,
     member.fullName,
+    member.firstName,
+    member.lastName,
     member.legislativeRole,
     member.state,
     member.congressionalDistrict,
