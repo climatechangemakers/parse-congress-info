@@ -10,6 +10,8 @@ class DumpToSqlTest {
       ClimateChangemakersMemberOfCongress(
         bioguideId = "C000001",
         fullName = "Kevin Cianfarini",
+        firstName = "Kevin",
+        lastName = "Cianfarini",
         legislativeRole = "rep",
         state = "VA",
         congressionalDistrict = 4,
@@ -22,11 +24,11 @@ class DumpToSqlTest {
 
     assertEquals(
       expected = """
-        |INSERT INTO member_of_congress(bioguide_id, full_name, legislative_role, state, congressional_district, party, dc_phone_number, twitter_handle, cwc_office_code)
+        |INSERT INTO member_of_congress(bioguide_id, full_name, first_name, last_name, legislative_role, state, congressional_district, party, dc_phone_number, twitter_handle, cwc_office_code)
         |VALUES
-        |('C000001', 'Kevin Cianfarini', 'rep', 'VA', 4, 'Democrat', '555.555.5555', NULL, NULL)
+        |('C000001', 'Kevin Cianfarini', 'Kevin', 'Cianfarini', 'rep', 'VA', 4, 'Democrat', '555.555.5555', NULL, NULL)
         |ON CONFLICT(bioguide_id) DO UPDATE
-        |SET (bioguide_id, full_name, legislative_role, state, congressional_district, party, dc_phone_number, twitter_handle, cwc_office_code) = (EXCLUDED.bioguide_id, EXCLUDED.full_name, EXCLUDED.legislative_role, EXCLUDED.state, EXCLUDED.congressional_district, EXCLUDED.party, EXCLUDED.dc_phone_number, EXCLUDED.twitter_handle, EXCLUDED.cwc_office_code);
+        |SET (bioguide_id, full_name, first_name, last_name, legislative_role, state, congressional_district, party, dc_phone_number, twitter_handle, cwc_office_code) = (EXCLUDED.bioguide_id, EXCLUDED.full_name, EXCLUDED.first_name, EXCLUDED.last_name, EXCLUDED.legislative_role, EXCLUDED.state, EXCLUDED.congressional_district, EXCLUDED.party, EXCLUDED.dc_phone_number, EXCLUDED.twitter_handle, EXCLUDED.cwc_office_code);
       """.trimMargin(),
       actual = dumpToSql(members)
     )
@@ -37,6 +39,8 @@ class DumpToSqlTest {
       ClimateChangemakersMemberOfCongress(
         bioguideId = "C000001",
         fullName = "Kevin Ci'anfarini",
+        firstName = "Kevin",
+        lastName = "Ci'anfarini",
         legislativeRole = "rep",
         state = "VA",
         congressionalDistrict = 4,
@@ -49,11 +53,11 @@ class DumpToSqlTest {
 
     assertEquals(
       expected = """
-        |INSERT INTO member_of_congress(bioguide_id, full_name, legislative_role, state, congressional_district, party, dc_phone_number, twitter_handle, cwc_office_code)
+        |INSERT INTO member_of_congress(bioguide_id, full_name, first_name, last_name, legislative_role, state, congressional_district, party, dc_phone_number, twitter_handle, cwc_office_code)
         |VALUES
-        |('C000001', 'Kevin Ci''anfarini', 'rep', 'VA', 4, 'Democrat', '555.555.5555', NULL, NULL)
+        |('C000001', 'Kevin Ci''anfarini', 'Kevin', 'Ci''anfarini', 'rep', 'VA', 4, 'Democrat', '555.555.5555', NULL, NULL)
         |ON CONFLICT(bioguide_id) DO UPDATE
-        |SET (bioguide_id, full_name, legislative_role, state, congressional_district, party, dc_phone_number, twitter_handle, cwc_office_code) = (EXCLUDED.bioguide_id, EXCLUDED.full_name, EXCLUDED.legislative_role, EXCLUDED.state, EXCLUDED.congressional_district, EXCLUDED.party, EXCLUDED.dc_phone_number, EXCLUDED.twitter_handle, EXCLUDED.cwc_office_code);
+        |SET (bioguide_id, full_name, first_name, last_name, legislative_role, state, congressional_district, party, dc_phone_number, twitter_handle, cwc_office_code) = (EXCLUDED.bioguide_id, EXCLUDED.full_name, EXCLUDED.first_name, EXCLUDED.last_name, EXCLUDED.legislative_role, EXCLUDED.state, EXCLUDED.congressional_district, EXCLUDED.party, EXCLUDED.dc_phone_number, EXCLUDED.twitter_handle, EXCLUDED.cwc_office_code);
       """.trimMargin(),
       actual = dumpToSql(members)
     )
@@ -64,6 +68,8 @@ class DumpToSqlTest {
       ClimateChangemakersMemberOfCongress(
         bioguideId = "C000001",
         fullName = "Kevin Cianfarini",
+        firstName = "Kevin",
+        lastName = "Cianfarini",
         legislativeRole = "rep",
         state = "VA",
         congressionalDistrict = 4,
@@ -75,6 +81,8 @@ class DumpToSqlTest {
       ClimateChangemakersMemberOfCongress(
         bioguideId = "C000002",
         fullName = "Kevin Cianfarini 2",
+        firstName = "Kevin",
+        lastName = "Cianfarini 2",
         legislativeRole = "sen",
         state = "VA",
         congressionalDistrict = null,
@@ -87,12 +95,12 @@ class DumpToSqlTest {
 
     assertEquals(
       expected = """
-        |INSERT INTO member_of_congress(bioguide_id, full_name, legislative_role, state, congressional_district, party, dc_phone_number, twitter_handle, cwc_office_code)
+        |INSERT INTO member_of_congress(bioguide_id, full_name, first_name, last_name, legislative_role, state, congressional_district, party, dc_phone_number, twitter_handle, cwc_office_code)
         |VALUES
-        |('C000001', 'Kevin Cianfarini', 'rep', 'VA', 4, 'Democrat', '555.555.5555', NULL, NULL),
-        |('C000002', 'Kevin Cianfarini 2', 'sen', 'VA', NULL, 'Republican', '555.555.5556', NULL, NULL)
+        |('C000001', 'Kevin Cianfarini', 'Kevin', 'Cianfarini', 'rep', 'VA', 4, 'Democrat', '555.555.5555', NULL, NULL),
+        |('C000002', 'Kevin Cianfarini 2', 'Kevin', 'Cianfarini 2', 'sen', 'VA', NULL, 'Republican', '555.555.5556', NULL, NULL)
         |ON CONFLICT(bioguide_id) DO UPDATE
-        |SET (bioguide_id, full_name, legislative_role, state, congressional_district, party, dc_phone_number, twitter_handle, cwc_office_code) = (EXCLUDED.bioguide_id, EXCLUDED.full_name, EXCLUDED.legislative_role, EXCLUDED.state, EXCLUDED.congressional_district, EXCLUDED.party, EXCLUDED.dc_phone_number, EXCLUDED.twitter_handle, EXCLUDED.cwc_office_code);
+        |SET (bioguide_id, full_name, first_name, last_name, legislative_role, state, congressional_district, party, dc_phone_number, twitter_handle, cwc_office_code) = (EXCLUDED.bioguide_id, EXCLUDED.full_name, EXCLUDED.first_name, EXCLUDED.last_name, EXCLUDED.legislative_role, EXCLUDED.state, EXCLUDED.congressional_district, EXCLUDED.party, EXCLUDED.dc_phone_number, EXCLUDED.twitter_handle, EXCLUDED.cwc_office_code);
       """.trimMargin(),
       actual = dumpToSql(members)
     )

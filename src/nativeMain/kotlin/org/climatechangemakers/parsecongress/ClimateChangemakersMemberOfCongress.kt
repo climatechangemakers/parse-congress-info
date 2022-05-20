@@ -6,6 +6,8 @@ import kotlinx.serialization.Serializable
 @Serializable class ClimateChangemakersMemberOfCongress(
   val bioguideId: String,
   val fullName: String,
+  val firstName: String,
+  val lastName: String,
   val legislativeRole: String,
   val state: String,
   val congressionalDistrict: Short?,
@@ -39,6 +41,8 @@ private fun combineLegislator(
   return ClimateChangemakersMemberOfCongress(
     bioguideId = legislator.id.bioguide,
     fullName = legislator.name.officialFullname,
+    firstName = legislator.name.firstName,
+    lastName = legislator.name.lastName,
     legislativeRole = current.representativeType,
     state = current.state,
     congressionalDistrict = current.district,
