@@ -1,5 +1,7 @@
 package org.climatechangemakers.parsecongress
 
+import kotlinx.datetime.LocalDate
+
 fun dumpToSql(members: List<ClimateChangemakersMemberOfCongress>) = buildString {
   val values = listOf(
     "bioguide_id",
@@ -13,6 +15,7 @@ fun dumpToSql(members: List<ClimateChangemakersMemberOfCongress>) = buildString 
     "dc_phone_number",
     "twitter_handle",
     "cwc_office_code",
+    "term_end",
   )
 
   writeInsertFragment(tableName = "member_of_congress", columnNames = values)
@@ -54,6 +57,7 @@ private fun StringBuilder.writerMember(member: ClimateChangemakersMemberOfCongre
     member.dcPhoneNumber,
     member.twitterHandle,
     member.cwcOfficeCode,
+    member.termEndDate,
   )
 )
 
@@ -114,6 +118,7 @@ private fun Any?.sqlEscape(): String = when (this) {
   null -> "NULL"
   is String -> "'${this.replace("'", "''")}'"
   is Number -> toString()
+  is LocalDate -> "'$year-${monthNumber.toString().padStart(2, padChar = '0')}-$dayOfMonth'"
   else -> error("Unexpected type ${this::class}")
 }
 
