@@ -118,7 +118,11 @@ private fun Any?.sqlEscape(): String = when (this) {
   null -> "NULL"
   is String -> "'${this.replace("'", "''")}'"
   is Number -> toString()
-  is LocalDate -> "'$year-${monthNumber.toString().padStart(2, padChar = '0')}-$dayOfMonth'"
+  is LocalDate -> {
+    val paddedMonth = monthNumber.toString().padStart(2, padChar = '0')
+    val paddedDay = dayOfMonth.toString().padStart(2, padChar = '0')
+    "'$year-$paddedMonth-$paddedDay'"
+  }
   else -> error("Unexpected type ${this::class}")
 }
 

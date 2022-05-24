@@ -44,6 +44,39 @@ class DumpToSqlTest {
     )
   }
 
+  @Test fun `date is padded correctly`() {
+    val clock = object : Clock {
+      override fun now(): Instant = Instant.fromEpochSeconds(1649350162L)
+    }
+    val members = listOf(
+      ClimateChangemakersMemberOfCongress(
+        bioguideId = "C000001",
+        fullName = "Kevin Cianfarini",
+        firstName = "Kevin",
+        lastName = "Cianfarini",
+        legislativeRole = "rep",
+        state = "VA",
+        congressionalDistrict = 4,
+        party = "Democrat",
+        dcPhoneNumber = "555.555.5555",
+        twitterHandle = null,
+        cwcOfficeCode = null,
+        termEndDate = clock.todayAt(TimeZone.UTC),
+      )
+    )
+
+    assertEquals(
+      expected = """
+        |INSERT INTO member_of_congress(bioguide_id, full_name, first_name, last_name, legislative_role, state, congressional_district, party, dc_phone_number, twitter_handle, cwc_office_code, term_end)
+        |VALUES
+        |('C000001', 'Kevin Cianfarini', 'Kevin', 'Cianfarini', 'rep', 'VA', 4, 'Democrat', '555.555.5555', NULL, NULL, '2022-04-07')
+        |ON CONFLICT(bioguide_id) DO UPDATE
+        |SET (bioguide_id, full_name, first_name, last_name, legislative_role, state, congressional_district, party, dc_phone_number, twitter_handle, cwc_office_code, term_end) = (EXCLUDED.bioguide_id, EXCLUDED.full_name, EXCLUDED.first_name, EXCLUDED.last_name, EXCLUDED.legislative_role, EXCLUDED.state, EXCLUDED.congressional_district, EXCLUDED.party, EXCLUDED.dc_phone_number, EXCLUDED.twitter_handle, EXCLUDED.cwc_office_code, EXCLUDED.term_end);
+      """.trimMargin(),
+      actual = dumpToSql(members)
+    )
+  }
+
   @Test fun `dumping a single member of congress escapes apostrophe`() {
     val members = listOf(
       ClimateChangemakersMemberOfCongress(
