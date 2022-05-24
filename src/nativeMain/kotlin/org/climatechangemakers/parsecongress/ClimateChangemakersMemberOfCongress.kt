@@ -1,6 +1,7 @@
 package org.climatechangemakers.parsecongress
 
 import kotlinx.datetime.Clock
+import kotlinx.datetime.LocalDate
 import kotlinx.serialization.Serializable
 
 @Serializable class ClimateChangemakersMemberOfCongress(
@@ -15,6 +16,7 @@ import kotlinx.serialization.Serializable
   val dcPhoneNumber: String,
   val twitterHandle: String?,
   val cwcOfficeCode: String?,
+  val termEndDate: LocalDate,
 )
 
 fun combineCurrentLegislators(
@@ -50,6 +52,7 @@ private fun combineLegislator(
     dcPhoneNumber = current.phone!!,
     twitterHandle = twitterAccount,
     cwcOfficeCode = generateCWCOfficeCodeForLegislator(scwcOfficeCode, current),
+    termEndDate = current.end,
   )
 }
 
