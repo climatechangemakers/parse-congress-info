@@ -1,18 +1,10 @@
 package org.climatechangemakers.parsecongress
 
-import kotlinx.datetime.Clock
-import kotlinx.datetime.Instant
-import kotlinx.datetime.TimeZone
-import kotlinx.datetime.todayAt
+import kotlinx.datetime.LocalDate
 import kotlin.test.Test
 import kotlin.test.assertEquals
 
 class DumpToSqlTest {
-
-  private val fakeClock = object : Clock {
-    // April 27, 2022
-    override fun now() = Instant.fromEpochSeconds(epochSeconds = 1651078162L)
-  }
 
   @Test fun `dumping a single member of congress produces expected result`() {
     val members = listOf(
@@ -28,7 +20,7 @@ class DumpToSqlTest {
         dcPhoneNumber = "555.555.5555",
         twitterHandle = null,
         cwcOfficeCode = null,
-        termEndDate = fakeClock.todayAt(TimeZone.UTC),
+        termEndDate = LocalDate(year = 2022, monthNumber = 4, dayOfMonth = 27),
       )
     )
 
@@ -45,9 +37,6 @@ class DumpToSqlTest {
   }
 
   @Test fun `date is padded correctly`() {
-    val clock = object : Clock {
-      override fun now(): Instant = Instant.fromEpochSeconds(1649350162L)
-    }
     val members = listOf(
       ClimateChangemakersMemberOfCongress(
         bioguideId = "C000001",
@@ -61,7 +50,7 @@ class DumpToSqlTest {
         dcPhoneNumber = "555.555.5555",
         twitterHandle = null,
         cwcOfficeCode = null,
-        termEndDate = clock.todayAt(TimeZone.UTC),
+        termEndDate = LocalDate(year = 2022, monthNumber = 4, dayOfMonth = 7),
       )
     )
 
@@ -91,7 +80,7 @@ class DumpToSqlTest {
         dcPhoneNumber = "555.555.5555",
         twitterHandle = null,
         cwcOfficeCode = null,
-        termEndDate = fakeClock.todayAt(TimeZone.UTC),
+        termEndDate = LocalDate(year = 2022, monthNumber = 4, dayOfMonth = 27),
       )
     )
 
@@ -121,7 +110,7 @@ class DumpToSqlTest {
         dcPhoneNumber = "555.555.5555",
         twitterHandle = null,
         cwcOfficeCode = null,
-        termEndDate = fakeClock.todayAt(TimeZone.UTC),
+        termEndDate = LocalDate(year = 2022, monthNumber = 4, dayOfMonth = 27),
       ),
       ClimateChangemakersMemberOfCongress(
         bioguideId = "C000002",
@@ -135,7 +124,7 @@ class DumpToSqlTest {
         dcPhoneNumber = "555.555.5556",
         twitterHandle = null,
         cwcOfficeCode = null,
-        termEndDate = fakeClock.todayAt(TimeZone.UTC),
+        termEndDate = LocalDate(year = 2022, monthNumber = 4, dayOfMonth = 27),
       )
     )
 
@@ -173,7 +162,7 @@ class DumpToSqlTest {
     )
   }
 
-  @Test fun `dumping multiple distrcit offices produces expected result`() {
+  @Test fun `dumping multiple district offices produces expected result`() {
     val offices = listOf(
       ClimateChangemakersDistrictOffice(
         bioguide = "C000002",

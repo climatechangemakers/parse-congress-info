@@ -7,10 +7,7 @@ import com.github.ajalt.clikt.parameters.groups.groupChoice
 import com.github.ajalt.clikt.parameters.groups.required
 import com.github.ajalt.clikt.parameters.options.option
 import com.github.ajalt.clikt.parameters.options.required
-import kotlinx.datetime.Clock
-import kotlinx.serialization.encodeToString
 import kotlinx.serialization.json.Json
-import okio.BufferedSink
 import okio.Path
 import org.climatechangemakers.parsecongress.extensions.filterNotNullValues
 import org.climatechangemakers.parsecongress.extensions.path
@@ -73,7 +70,7 @@ class Parse : CliktCommand() {
       valueTransform = { it.social.twitter },
     ).filterNotNullValues()
 
-    combineCurrentLegislators(currentLegislators, activeScwcOffices, legislatorTwitterAccounts, Clock.System)
+    combineCurrentLegislators(currentLegislators, activeScwcOffices, legislatorTwitterAccounts)
       .let(::dumpToSql)
       .run(outputFilePath::writeContents)
   }
