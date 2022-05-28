@@ -29,6 +29,10 @@ fun List<UnitedStatesTermInfo>.current(clock: Clock): UnitedStatesTermInfo {
   }
 }
 
+fun List<UnitedStatesTermInfo>.mostRecent(): UnitedStatesTermInfo = checkNotNull(
+  maxByOrNull { term -> term.end }
+) { "Terms $this had no max." }
+
 @Serializable class UnitedStatesIdentifiers(
   val bioguide: String,
 )

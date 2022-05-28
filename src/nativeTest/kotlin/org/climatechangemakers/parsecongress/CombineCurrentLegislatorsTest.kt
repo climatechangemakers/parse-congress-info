@@ -1,17 +1,10 @@
 package org.climatechangemakers.parsecongress
 
-import kotlinx.datetime.Clock
-import kotlinx.datetime.Instant
 import kotlinx.datetime.LocalDate
 import kotlin.test.Test
 import kotlin.test.assertEquals
 
 class CombineCurrentLegislatorsTest {
-
-  private val fakeClock = object : Clock {
-    // April 27, 2022
-    override fun now() = Instant.fromEpochSeconds(epochSeconds = 1651078162L)
-  }
 
   private val activeScwcOffices = mapOf(
     "P000145" to "SCA03",
@@ -50,7 +43,6 @@ class CombineCurrentLegislatorsTest {
       currentLegislators = listOf(unitedStatesMemberOfCongress),
       activeScwcOffices = activeScwcOffices,
       twitterAccounts = legislatorTwitterAccounts,
-      fakeClock,
     )
 
     assertEquals(
@@ -84,7 +76,6 @@ class CombineCurrentLegislatorsTest {
       currentLegislators = listOf(unitedStatesMemberOfCongress),
       activeScwcOffices = activeScwcOffices,
       twitterAccounts = legislatorTwitterAccounts,
-      fakeClock,
     )
 
     assertEquals(
@@ -118,7 +109,6 @@ class CombineCurrentLegislatorsTest {
       currentLegislators = listOf(unitedStatesMemberOfCongress),
       activeScwcOffices = activeScwcOffices,
       twitterAccounts = legislatorTwitterAccounts,
-      fakeClock,
     )
 
     assertEquals(
@@ -152,12 +142,53 @@ class CombineCurrentLegislatorsTest {
       currentLegislators = listOf(unitedStatesMemberOfCongress),
       activeScwcOffices = activeScwcOffices,
       twitterAccounts = legislatorTwitterAccounts,
-      fakeClock,
     )
 
     assertEquals(
       expected = "HAQ00",
       actual = climateChangemakersMemberOfCongress.first().cwcOfficeCode,
+    )
+  }
+
+  @Test fun `combining gets correct term`() {
+    val unitedStatesMemberOfCongress = UnitedStatesMemberOfCongress(
+      id = UnitedStatesIdentifiers(bioguide = "M001200"),
+      name = UnitedStatesNameInfo(
+        firstName = "Donald",
+        lastName = "McEachin",
+        officialFullname = "A. Donald McEachin",
+      ),
+      terms = listOf(
+        UnitedStatesTermInfo(
+          representativeType = "rep",
+          state = "AS",
+          district = 0,
+          party = "Democrat",
+          phone = "867.5309",
+          start = LocalDate(year = 2020, monthNumber = 1, dayOfMonth = 1),
+          end = LocalDate(year = 2024, monthNumber = 1, dayOfMonth = 1)
+        ),
+        UnitedStatesTermInfo(
+          representativeType = "rep",
+          state = "AS",
+          district = 0,
+          party = "Democrat",
+          phone = "867.5309",
+          start = LocalDate(year = 2016, monthNumber = 1, dayOfMonth = 1),
+          end = LocalDate(year = 2020, monthNumber = 1, dayOfMonth = 1)
+        ),
+      )
+    )
+
+    val climateChangemakersMemberOfCongress = combineCurrentLegislators(
+      currentLegislators = listOf(unitedStatesMemberOfCongress),
+      activeScwcOffices = activeScwcOffices,
+      twitterAccounts = legislatorTwitterAccounts,
+    )
+
+    assertEquals(
+      expected = LocalDate(year = 2024, dayOfMonth = 1, monthNumber = 1),
+      actual = climateChangemakersMemberOfCongress.first().termEndDate,
     )
   }
 }

@@ -1,6 +1,5 @@
 package org.climatechangemakers.parsecongress
 
-import kotlinx.datetime.Clock
 import kotlinx.datetime.LocalDate
 import kotlinx.serialization.Serializable
 
@@ -23,13 +22,11 @@ fun combineCurrentLegislators(
   currentLegislators: List<UnitedStatesMemberOfCongress>,
   activeScwcOffices: Map<String, String>,
   twitterAccounts: Map<String, String>,
-  clock: Clock,
 ): List<ClimateChangemakersMemberOfCongress> = currentLegislators.map { legislator ->
   combineLegislator(
     legislator = legislator,
     scwcOfficeCode = activeScwcOffices[legislator.id.bioguide],
     twitterAccount = twitterAccounts[legislator.id.bioguide],
-    clock,
   )
 }
 
@@ -37,9 +34,8 @@ private fun combineLegislator(
   legislator: UnitedStatesMemberOfCongress,
   scwcOfficeCode: String?,
   twitterAccount: String?,
-  clock: Clock,
 ): ClimateChangemakersMemberOfCongress {
-  val current = legislator.terms.current(clock)
+  val current = legislator.terms.mostRecent()
   return ClimateChangemakersMemberOfCongress(
     bioguideId = legislator.id.bioguide,
     fullName = legislator.name.officialFullname,
