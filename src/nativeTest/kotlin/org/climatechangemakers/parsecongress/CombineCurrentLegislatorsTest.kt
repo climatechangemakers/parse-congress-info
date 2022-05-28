@@ -3,6 +3,7 @@ package org.climatechangemakers.parsecongress
 import kotlinx.datetime.LocalDate
 import kotlin.test.Test
 import kotlin.test.assertEquals
+import kotlin.test.assertNull
 
 class CombineCurrentLegislatorsTest {
 
@@ -39,10 +40,11 @@ class CombineCurrentLegislatorsTest {
       )
     )
 
-    val climateChangemakersMemberOfCongress = combineCurrentLegislators(
-      currentLegislators = listOf(unitedStatesMemberOfCongress),
+    val climateChangemakersMemberOfCongress = combineLegislators(
+      legislators = listOf(unitedStatesMemberOfCongress),
       activeScwcOffices = activeScwcOffices,
       twitterAccounts = legislatorTwitterAccounts,
+      today = LocalDate(year = 2022, monthNumber = 4, dayOfMonth = 27),
     )
 
     assertEquals(
@@ -72,10 +74,11 @@ class CombineCurrentLegislatorsTest {
       )
     )
 
-    val climateChangemakersMemberOfCongress = combineCurrentLegislators(
-      currentLegislators = listOf(unitedStatesMemberOfCongress),
+    val climateChangemakersMemberOfCongress = combineLegislators(
+      legislators = listOf(unitedStatesMemberOfCongress),
       activeScwcOffices = activeScwcOffices,
       twitterAccounts = legislatorTwitterAccounts,
+      today = LocalDate(year = 2022, monthNumber = 4, dayOfMonth = 27),
     )
 
     assertEquals(
@@ -105,10 +108,11 @@ class CombineCurrentLegislatorsTest {
       )
     )
 
-    val climateChangemakersMemberOfCongress = combineCurrentLegislators(
-      currentLegislators = listOf(unitedStatesMemberOfCongress),
+    val climateChangemakersMemberOfCongress = combineLegislators(
+      legislators = listOf(unitedStatesMemberOfCongress),
       activeScwcOffices = activeScwcOffices,
       twitterAccounts = legislatorTwitterAccounts,
+      today = LocalDate(year = 2022, monthNumber = 4, dayOfMonth = 27),
     )
 
     assertEquals(
@@ -138,16 +142,48 @@ class CombineCurrentLegislatorsTest {
       )
     )
 
-    val climateChangemakersMemberOfCongress = combineCurrentLegislators(
-      currentLegislators = listOf(unitedStatesMemberOfCongress),
+    val climateChangemakersMemberOfCongress = combineLegislators(
+      legislators = listOf(unitedStatesMemberOfCongress),
       activeScwcOffices = activeScwcOffices,
       twitterAccounts = legislatorTwitterAccounts,
+      today = LocalDate(year = 2022, monthNumber = 4, dayOfMonth = 27),
     )
 
     assertEquals(
       expected = "HAQ00",
       actual = climateChangemakersMemberOfCongress.first().cwcOfficeCode,
     )
+  }
+
+  @Test fun `historical legislators have a null CWC code`() {
+    val unitedStatesMemberOfCongress = UnitedStatesMemberOfCongress(
+      id = UnitedStatesIdentifiers(bioguide = "M001200"),
+      name = UnitedStatesNameInfo(
+        firstName = "Donald",
+        lastName = "McEachin",
+        officialFullname = "A. Donald McEachin",
+      ),
+      terms = listOf(
+        UnitedStatesTermInfo(
+          representativeType = "rep",
+          state = "VA",
+          district = 4,
+          party = "Democrat",
+          phone = "867.5309",
+          start = LocalDate(year = 2016, monthNumber = 1, dayOfMonth = 1),
+          end = LocalDate(year = 2020, monthNumber = 1, dayOfMonth = 1)
+        )
+      )
+    )
+
+    val climateChangemakersMemberOfCongress = combineLegislators(
+      legislators = listOf(unitedStatesMemberOfCongress),
+      activeScwcOffices = activeScwcOffices,
+      twitterAccounts = legislatorTwitterAccounts,
+      today = LocalDate(year = 2022, monthNumber = 4, dayOfMonth = 27),
+    )
+
+    assertNull(climateChangemakersMemberOfCongress.first().cwcOfficeCode)
   }
 
   @Test fun `combining gets correct term`() {
@@ -180,10 +216,11 @@ class CombineCurrentLegislatorsTest {
       )
     )
 
-    val climateChangemakersMemberOfCongress = combineCurrentLegislators(
-      currentLegislators = listOf(unitedStatesMemberOfCongress),
+    val climateChangemakersMemberOfCongress = combineLegislators(
+      legislators = listOf(unitedStatesMemberOfCongress),
       activeScwcOffices = activeScwcOffices,
       twitterAccounts = legislatorTwitterAccounts,
+      today = LocalDate(year = 2022, monthNumber = 4, dayOfMonth = 27),
     )
 
     assertEquals(

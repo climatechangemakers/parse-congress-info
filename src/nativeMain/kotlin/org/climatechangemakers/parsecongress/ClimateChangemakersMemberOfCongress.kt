@@ -18,15 +18,17 @@ import kotlinx.serialization.Serializable
   val termEndDate: LocalDate,
 )
 
-fun combineCurrentLegislators(
-  currentLegislators: List<UnitedStatesMemberOfCongress>,
+fun combineLegislators(
+  legislators: List<UnitedStatesMemberOfCongress>,
   activeScwcOffices: Map<String, String>,
   twitterAccounts: Map<String, String>,
-): List<ClimateChangemakersMemberOfCongress> = currentLegislators.map { legislator ->
+  today: LocalDate,
+): List<ClimateChangemakersMemberOfCongress> = legislators.map { legislator ->
   combineLegislator(
     legislator = legislator,
     scwcOfficeCode = activeScwcOffices[legislator.id.bioguide],
     twitterAccount = twitterAccounts[legislator.id.bioguide],
+    today = today,
   )
 }
 
@@ -34,20 +36,25 @@ private fun combineLegislator(
   legislator: UnitedStatesMemberOfCongress,
   scwcOfficeCode: String?,
   twitterAccount: String?,
+  today: LocalDate,
 ): ClimateChangemakersMemberOfCongress {
   val current = legislator.terms.mostRecent()
   return ClimateChangemakersMemberOfCongress(
     bioguideId = legislator.id.bioguide,
-    fullName = legislator.name.officialFullname,
+    fullName = checkNotNull(legislator.name.officialFullname) { "$legislator did not have an official full name." },
     firstName = legislator.name.firstName,
     lastName = legislator.name.lastName,
     legislativeRole = current.representativeType,
     state = current.state,
     congressionalDistrict = current.district,
-    party = current.party,
-    dcPhoneNumber = current.phone!!,
+    party = checkNotNull(current.party) { "$legislator did not have a most recent party." },
+    dcPhoneNumber = checkNotNull(current.phone) { "$legislator did not have a most recent DC phone." },
     twitterHandle = twitterAccount,
-    cwcOfficeCode = generateCWCOfficeCodeForLegislator(scwcOfficeCode, current),
+    cwcOfficeCode = if (current.isActiveForDate(today)) {
+      generateCWCOfficeCodeForLegislator(scwcOfficeCode, current)
+    } else {
+      null
+    },
     termEndDate = current.end,
   )
 }

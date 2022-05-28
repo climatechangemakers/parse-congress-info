@@ -1,9 +1,6 @@
 package org.climatechangemakers.parsecongress
 
-import kotlinx.datetime.Clock
 import kotlinx.datetime.LocalDate
-import kotlinx.datetime.TimeZone
-import kotlinx.datetime.todayAt
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
 import kotlinx.serialization.decodeFromString
@@ -22,13 +19,6 @@ fun parseUnitedStatesMemberOfCongressFile(
   val terms: List<UnitedStatesTermInfo>,
 )
 
-fun List<UnitedStatesTermInfo>.current(clock: Clock): UnitedStatesTermInfo {
-  val currentDate = clock.todayAt(TimeZone.UTC)
-  return single { term ->
-    term.start <= currentDate && currentDate <= term.end
-  }
-}
-
 fun List<UnitedStatesTermInfo>.mostRecent(): UnitedStatesTermInfo = checkNotNull(
   maxByOrNull { term -> term.end }
 ) { "Terms $this had no max." }
@@ -40,14 +30,14 @@ fun List<UnitedStatesTermInfo>.mostRecent(): UnitedStatesTermInfo = checkNotNull
 @Serializable class UnitedStatesNameInfo(
   @SerialName("first") val firstName: String,
   @SerialName("last") val lastName: String,
-  @SerialName("official_full") val officialFullname: String,
+  @SerialName("official_full") val officialFullname: String?,
 )
 
 @Serializable class UnitedStatesTermInfo(
   @SerialName("type") val representativeType: String,
   val state: String,
   val district: Short?,
-  val party: String,
+  val party: String?,
   val phone: String?,
   val start: LocalDate,
   val end: LocalDate
@@ -58,5 +48,9 @@ fun List<UnitedStatesTermInfo>.mostRecent(): UnitedStatesTermInfo = checkNotNull
     } else {
       require(district == null)
     }
+  }
+
+  fun isActiveForDate(date: LocalDate): Boolean {
+    return date in start..end
   }
 }

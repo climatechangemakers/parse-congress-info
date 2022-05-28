@@ -7,6 +7,9 @@ import com.github.ajalt.clikt.parameters.groups.groupChoice
 import com.github.ajalt.clikt.parameters.groups.required
 import com.github.ajalt.clikt.parameters.options.option
 import com.github.ajalt.clikt.parameters.options.required
+import kotlinx.datetime.Clock
+import kotlinx.datetime.TimeZone
+import kotlinx.datetime.todayAt
 import kotlinx.serialization.json.Json
 import okio.Path
 import org.climatechangemakers.parsecongress.extensions.filterNotNullValues
@@ -24,6 +27,7 @@ sealed class FileOption(description: String) : OptionGroup(description) {
 
   class CurrentLegislators : FileOption("Merge CWC and legislators JSON into a single CSV") {
     val legislatorsPath: Path by option("-l", "--legislators").path(mustExist = true).required()
+    val historicalLegislatorsPath: Path by option("-h", "--historical-legislators").path(mustExist = true).required()
     val cwcOfficeCodesPath: Path by option("-c", "--cwc").path(mustExist = true).required()
     val socialMediaPath: Path by option("-s", "--social").path(mustExist = true).required()
   }
@@ -57,6 +61,19 @@ class Parse : CliktCommand() {
       json,
     )
 
+    val historicalLegislators: List<UnitedStatesMemberOfCongress> = parseUnitedStatesMemberOfCongressFile(
+      group.historicalLegislatorsPath.readContents(),
+      json,
+    ).filter { member ->
+      val term = member.terms.mostRecent()
+      // Some historical Members of Congress don't have a party. Omit them.
+      term.party != null &&
+          // Some historical Members of Congress don't have a DC phone. Omit them.
+          term.phone != null &&
+          // Come historical Members of Congress don't have an official full name. Omit them.
+          member.name.officialFullname != null
+    }
+
     val activeScwcOffices: Map<String, String> = parseActiveCwcOffices(
       group.cwcOfficeCodesPath.readContents(),
       json,
@@ -70,9 +87,12 @@ class Parse : CliktCommand() {
       valueTransform = { it.social.twitter },
     ).filterNotNullValues()
 
-    combineCurrentLegislators(currentLegislators, activeScwcOffices, legislatorTwitterAccounts)
-      .let(::dumpToSql)
-      .run(outputFilePath::writeContents)
+    combineLegislators(
+      legislators = currentLegislators + historicalLegislators,
+      activeScwcOffices = activeScwcOffices,
+      twitterAccounts = legislatorTwitterAccounts,
+      today = Clock.System.todayAt(TimeZone.UTC),
+    ).let(::dumpToSql).run(outputFilePath::writeContents)
   }
 
   private fun runDistrictOffices(group: FileOption.DistrictOffices) {
