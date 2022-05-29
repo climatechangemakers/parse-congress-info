@@ -3,13 +3,16 @@ package org.climatechangemakers.parsecongress
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.json.Json
 import kotlinx.serialization.Serializable
-import kotlinx.serialization.decodeFromString
+import kotlinx.serialization.builtins.ListSerializer
 
 fun parseActiveCwcOffices(
   rawJson: String,
   json: Json,
 ): List<ActiveOffice> {
-  return json.decodeFromString(rawJson)
+  return json.decodeFromString(
+    deserializer = ListSerializer(ActiveOffice.serializer()),
+    string = rawJson,
+  )
 }
 
 private val bioguideRegex = Regex("""[A-Z][0-9]+""")

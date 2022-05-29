@@ -3,14 +3,17 @@ package org.climatechangemakers.parsecongress
 import kotlinx.datetime.LocalDate
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
-import kotlinx.serialization.decodeFromString
+import kotlinx.serialization.builtins.ListSerializer
 import kotlinx.serialization.json.Json
 
 fun parseUnitedStatesMemberOfCongressFile(
   rawJson: String,
   json: Json,
 ): List<UnitedStatesMemberOfCongress> {
-  return json.decodeFromString(rawJson)
+  return json.decodeFromString(
+    deserializer = ListSerializer(UnitedStatesMemberOfCongress.serializer()),
+    string = rawJson
+  )
 }
 
 @Serializable class UnitedStatesMemberOfCongress(
