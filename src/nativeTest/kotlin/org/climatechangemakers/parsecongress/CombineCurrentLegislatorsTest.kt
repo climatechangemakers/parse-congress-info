@@ -1,9 +1,12 @@
 package org.climatechangemakers.parsecongress
 
+import com.github.ajalt.clikt.core.PrintMessage
 import kotlinx.datetime.LocalDate
 import kotlin.test.Test
 import kotlin.test.assertEquals
+import kotlin.test.assertFailsWith
 import kotlin.test.assertNull
+import kotlin.test.assertTrue
 
 class CombineCurrentLegislatorsTest {
 
@@ -41,7 +44,8 @@ class CombineCurrentLegislatorsTest {
     )
 
     val climateChangemakersMemberOfCongress = combineLegislators(
-      legislators = listOf(unitedStatesMemberOfCongress),
+      current = listOf(unitedStatesMemberOfCongress),
+      historical = emptyList(),
       activeScwcOffices = activeScwcOffices,
       twitterAccounts = legislatorTwitterAccounts,
       today = LocalDate(year = 2022, monthNumber = 4, dayOfMonth = 27),
@@ -75,7 +79,8 @@ class CombineCurrentLegislatorsTest {
     )
 
     val climateChangemakersMemberOfCongress = combineLegislators(
-      legislators = listOf(unitedStatesMemberOfCongress),
+      current = listOf(unitedStatesMemberOfCongress),
+      historical = emptyList(),
       activeScwcOffices = activeScwcOffices,
       twitterAccounts = legislatorTwitterAccounts,
       today = LocalDate(year = 2022, monthNumber = 4, dayOfMonth = 27),
@@ -109,7 +114,8 @@ class CombineCurrentLegislatorsTest {
     )
 
     val climateChangemakersMemberOfCongress = combineLegislators(
-      legislators = listOf(unitedStatesMemberOfCongress),
+      current = listOf(unitedStatesMemberOfCongress),
+      historical = emptyList(),
       activeScwcOffices = activeScwcOffices,
       twitterAccounts = legislatorTwitterAccounts,
       today = LocalDate(year = 2022, monthNumber = 4, dayOfMonth = 27),
@@ -143,7 +149,8 @@ class CombineCurrentLegislatorsTest {
     )
 
     val climateChangemakersMemberOfCongress = combineLegislators(
-      legislators = listOf(unitedStatesMemberOfCongress),
+      current = listOf(unitedStatesMemberOfCongress),
+      historical = emptyList(),
       activeScwcOffices = activeScwcOffices,
       twitterAccounts = legislatorTwitterAccounts,
       today = LocalDate(year = 2022, monthNumber = 4, dayOfMonth = 27),
@@ -177,7 +184,8 @@ class CombineCurrentLegislatorsTest {
     )
 
     val climateChangemakersMemberOfCongress = combineLegislators(
-      legislators = listOf(unitedStatesMemberOfCongress),
+      current = listOf(unitedStatesMemberOfCongress),
+      historical = emptyList(),
       activeScwcOffices = activeScwcOffices,
       twitterAccounts = legislatorTwitterAccounts,
       today = LocalDate(year = 2022, monthNumber = 4, dayOfMonth = 27),
@@ -217,7 +225,8 @@ class CombineCurrentLegislatorsTest {
     )
 
     val climateChangemakersMemberOfCongress = combineLegislators(
-      legislators = listOf(unitedStatesMemberOfCongress),
+      current = listOf(unitedStatesMemberOfCongress),
+      historical = emptyList(),
       activeScwcOffices = activeScwcOffices,
       twitterAccounts = legislatorTwitterAccounts,
       today = LocalDate(year = 2022, monthNumber = 4, dayOfMonth = 27),
@@ -227,5 +236,133 @@ class CombineCurrentLegislatorsTest {
       expected = LocalDate(year = 2024, dayOfMonth = 1, monthNumber = 1),
       actual = climateChangemakersMemberOfCongress.first().termEndDate,
     )
+  }
+
+  @Test fun `historical legislators filters null party`() {
+    val unitedStatesMemberOfCongress = UnitedStatesMemberOfCongress(
+      id = UnitedStatesIdentifiers(bioguide = "M001200"),
+      name = UnitedStatesNameInfo(
+        firstName = "Donald",
+        lastName = "McEachin",
+        officialFullname = "A. Donald McEachin",
+      ),
+      terms = listOf(
+        UnitedStatesTermInfo(
+          representativeType = "rep",
+          state = "AS",
+          district = 0,
+          party = null,
+          phone = "867.5309",
+          start = LocalDate(year = 2020, monthNumber = 1, dayOfMonth = 1),
+          end = LocalDate(year = 2024, monthNumber = 1, dayOfMonth = 1)
+        ),
+      )
+    )
+
+    val climateChangemakersMemberOfCongress = combineLegislators(
+      historical = listOf(unitedStatesMemberOfCongress),
+      current = emptyList(),
+      activeScwcOffices = activeScwcOffices,
+      twitterAccounts = legislatorTwitterAccounts,
+      today = LocalDate(year = 2022, monthNumber = 4, dayOfMonth = 27),
+    )
+
+    assertTrue(climateChangemakersMemberOfCongress.isEmpty())
+  }
+
+  @Test fun `historical legislators filters null DC phone`() {
+    val unitedStatesMemberOfCongress = UnitedStatesMemberOfCongress(
+      id = UnitedStatesIdentifiers(bioguide = "M001200"),
+      name = UnitedStatesNameInfo(
+        firstName = "Donald",
+        lastName = "McEachin",
+        officialFullname = "A. Donald McEachin",
+      ),
+      terms = listOf(
+        UnitedStatesTermInfo(
+          representativeType = "rep",
+          state = "AS",
+          district = 0,
+          party = "Democrat",
+          phone = null,
+          start = LocalDate(year = 2020, monthNumber = 1, dayOfMonth = 1),
+          end = LocalDate(year = 2024, monthNumber = 1, dayOfMonth = 1)
+        ),
+      )
+    )
+
+    val climateChangemakersMemberOfCongress = combineLegislators(
+      historical = listOf(unitedStatesMemberOfCongress),
+      current = emptyList(),
+      activeScwcOffices = activeScwcOffices,
+      twitterAccounts = legislatorTwitterAccounts,
+      today = LocalDate(year = 2022, monthNumber = 4, dayOfMonth = 27),
+    )
+
+    assertTrue(climateChangemakersMemberOfCongress.isEmpty())
+  }
+
+  @Test fun `historical legislators filters null official full name`() {
+    val unitedStatesMemberOfCongress = UnitedStatesMemberOfCongress(
+      id = UnitedStatesIdentifiers(bioguide = "M001200"),
+      name = UnitedStatesNameInfo(
+        firstName = "Donald",
+        lastName = "McEachin",
+        officialFullname = null,
+      ),
+      terms = listOf(
+        UnitedStatesTermInfo(
+          representativeType = "rep",
+          state = "AS",
+          district = 0,
+          party = "Democrat",
+          phone = "867.5309",
+          start = LocalDate(year = 2020, monthNumber = 1, dayOfMonth = 1),
+          end = LocalDate(year = 2024, monthNumber = 1, dayOfMonth = 1)
+        ),
+      )
+    )
+
+    val climateChangemakersMemberOfCongress = combineLegislators(
+      historical = listOf(unitedStatesMemberOfCongress),
+      current = emptyList(),
+      activeScwcOffices = activeScwcOffices,
+      twitterAccounts = legislatorTwitterAccounts,
+      today = LocalDate(year = 2022, monthNumber = 4, dayOfMonth = 27),
+    )
+
+    assertTrue(climateChangemakersMemberOfCongress.isEmpty())
+  }
+
+  @Test fun `duplicate legislators fails`() {
+    val unitedStatesMemberOfCongress = UnitedStatesMemberOfCongress(
+      id = UnitedStatesIdentifiers(bioguide = "M001200"),
+      name = UnitedStatesNameInfo(
+        firstName = "Donald",
+        lastName = "McEachin",
+        officialFullname = "A. Donald McEachin",
+      ),
+      terms = listOf(
+        UnitedStatesTermInfo(
+          representativeType = "rep",
+          state = "AS",
+          district = 0,
+          party = "Democrat",
+          phone = "867.5309",
+          start = LocalDate(year = 2020, monthNumber = 1, dayOfMonth = 1),
+          end = LocalDate(year = 2024, monthNumber = 1, dayOfMonth = 1)
+        ),
+      )
+    )
+
+    assertFailsWith<PrintMessage> {
+      combineLegislators(
+        historical = listOf(unitedStatesMemberOfCongress),
+        current = listOf(unitedStatesMemberOfCongress),
+        activeScwcOffices = activeScwcOffices,
+        twitterAccounts = legislatorTwitterAccounts,
+        today = LocalDate(year = 2022, monthNumber = 4, dayOfMonth = 27),
+      )
+    }
   }
 }

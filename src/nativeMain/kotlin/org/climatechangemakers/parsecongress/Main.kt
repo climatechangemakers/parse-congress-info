@@ -64,15 +64,7 @@ class Parse : CliktCommand() {
     val historicalLegislators: List<UnitedStatesMemberOfCongress> = parseUnitedStatesMemberOfCongressFile(
       group.historicalLegislatorsPath.readContents(),
       json,
-    ).filter { member ->
-      val term = member.terms.mostRecent()
-      // Some historical Members of Congress don't have a party. Omit them.
-      term.party != null &&
-          // Some historical Members of Congress don't have a DC phone. Omit them.
-          term.phone != null &&
-          // Come historical Members of Congress don't have an official full name. Omit them.
-          member.name.officialFullname != null
-    }
+    )
 
     val activeScwcOffices: Map<String, String> = parseActiveCwcOffices(
       group.cwcOfficeCodesPath.readContents(),
@@ -88,7 +80,8 @@ class Parse : CliktCommand() {
     ).filterNotNullValues()
 
     combineLegislators(
-      legislators = currentLegislators + historicalLegislators,
+      historical = historicalLegislators,
+      current = currentLegislators,
       activeScwcOffices = activeScwcOffices,
       twitterAccounts = legislatorTwitterAccounts,
       today = Clock.System.todayAt(TimeZone.UTC),

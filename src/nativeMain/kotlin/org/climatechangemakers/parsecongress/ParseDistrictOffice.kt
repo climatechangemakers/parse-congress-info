@@ -1,7 +1,7 @@
 package org.climatechangemakers.parsecongress
 
 import kotlinx.serialization.Serializable
-import kotlinx.serialization.decodeFromString
+import kotlinx.serialization.builtins.ListSerializer
 import kotlinx.serialization.json.Json
 import okio.BufferedSource
 import okio.FileSystem
@@ -27,7 +27,10 @@ class ClimateChangemakersDistrictOffice(
 
 fun readDistrictOfficeFile(path: Path, json: Json): List<ClimateChangemakersDistrictOffice> {
   val jsonString = FileSystem.SYSTEM.read(path, BufferedSource::readUtf8)
-  return json.decodeFromString<List<UnitedStatesMemberOfCongressDistrictOffices>>(jsonString).flatMap { member ->
+  return json.decodeFromString(
+    deserializer = ListSerializer(UnitedStatesMemberOfCongressDistrictOffices.serializer()),
+    string = jsonString,
+  ).flatMap { member ->
     member.offices.asSequence().filter { office ->
       // There's no use persising district offices that don't have phone numbers; it's the only data point we care about.
       office.phone != null
