@@ -83,7 +83,7 @@ private fun combineLegislator(
   val current = legislator.terms.mostRecent()
   return ClimateChangemakersMemberOfCongress(
     bioguideId = legislator.id.bioguide,
-    fullName = checkNotNull(legislator.name.officialFullname) { "$legislator did not have an official full name." },
+    fullName = legislator.name.officialFullname ?: "${legislator.name.firstName} ${legislator.name.lastName}",
     firstName = legislator.name.firstName,
     lastName = legislator.name.lastName,
     legislativeRole = current.representativeType,
