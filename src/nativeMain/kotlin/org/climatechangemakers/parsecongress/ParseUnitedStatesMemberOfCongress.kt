@@ -16,7 +16,7 @@ fun parseUnitedStatesMemberOfCongressFile(
   )
 }
 
-@Serializable class UnitedStatesMemberOfCongress(
+@Serializable data class UnitedStatesMemberOfCongress(
   val id: UnitedStatesIdentifiers,
   val name: UnitedStatesNameInfo,
   val terms: List<UnitedStatesTermInfo>,
@@ -26,11 +26,11 @@ fun List<UnitedStatesTermInfo>.mostRecent(): UnitedStatesTermInfo = checkNotNull
   maxByOrNull { term -> term.end }
 ) { "Terms $this had no max." }
 
-@Serializable class UnitedStatesIdentifiers(
+@Serializable data class UnitedStatesIdentifiers(
   val bioguide: String,
 )
 
-@Serializable class UnitedStatesNameInfo(
+@Serializable data class UnitedStatesNameInfo(
   @SerialName("first") val firstName: String,
   @SerialName("last") val lastName: String,
   @SerialName("official_full") val officialFullname: String?,
